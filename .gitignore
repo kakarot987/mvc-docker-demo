@@ -35,3 +35,26 @@ out/
 
 ### VS Code ###
 .vscode/
+
+# ==================== DOCKER & ENVIRONMENT ====================
+# Never commit environment variables with real credentials
+.env
+.env.local
+.env.*.local
+
+# Docker volumes and data
+mysql_dev_data/
+mysql_prod_data/
+backups/
+
+# Docker build artifacts
+dockerfile.bak
+docker-compose.override.yml
+
+# Log files
+*.log
+logs/
+
+# OS files
+.DS_Store
+Thumbs.db
