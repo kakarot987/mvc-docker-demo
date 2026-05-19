@@ -1,0 +1,48 @@
+.app-container {
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
+
+.navbar {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.spinner-border {
+  color: #0d6efd;
+}
+
+.table {
+  background-color: white;
+  border-radius: 0.25rem;
+  overflow: hidden;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.table thead {
+  background-color: #212529;
+}
+
+.table tbody tr:hover {
+  background-color: #f1f3f5;
+  transition: background-color 0.2s ease;
+}
+
+.alert {
+  border-radius: 0.25rem;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.card {
+  border-radius: 0.25rem;
+}
+
+.card-title {
+  color: #212529;
+  font-weight: 600;
+}
+
+footer {
+  background-color: white;
+  border-top: 1px solid #dee2e6;
+}
+

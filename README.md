@@ -1,22 +1,25 @@
 # MVC Docker Demo - Professional Portfolio Project
 
-> A comprehensive Spring Boot + MySQL application demonstrating enterprise-level Docker knowledge including multi-stage builds, environment-specific configurations, and production-ready practices.
+> A comprehensive **full-stack application** with React Frontend + Spring Boot Backend + MySQL Database, all containerized with Docker. Demonstrates enterprise-level Docker knowledge, multi-container orchestration, and production-ready practices.
 
 ![Java](https://img.shields.io/badge/Java-21-orange?style=flat-square)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.4.2-green?style=flat-square)
-![Docker](https://img.shields.io/badge/Docker-Multi--Stage%20Build-blue?style=flat-square)
+![React](https://img.shields.io/badge/React-18-blue?style=flat-square)
+![Docker](https://img.shields.io/badge/Docker-Multi--Container-blue?style=flat-square)
 ![MySQL](https://img.shields.io/badge/MySQL-8-blue?style=flat-square)
 
 ## 🎯 Project Overview
 
-This project showcases professional Docker skills and best practices suitable for portfolio presentations. It demonstrates:
+This project showcases professional Docker skills and full-stack development suitable for portfolio presentations. It demonstrates:
 
-- **Multi-stage Docker builds** for optimized image sizes
+- **Multi-stage Docker builds** for optimized images
+- **Multi-container orchestration** (3 services: DB, API, UI)
+- **React Frontend** with professional UI for user management
+- **Spring Boot REST API** with database integration
+- **Docker Compose** orchestration with health checks
 - **Environment-specific configurations** (dev, prod)
-- **Spring Boot profiles** for different deployment scenarios
-- **Docker Compose orchestration** with health checks and logging
-- **Security best practices** (non-root user, secret management)
-- **Production-ready optimizations** (JVM tuning, database pooling)
+- **Security best practices** (non-root users, secrets, CORS)
+- **Production-ready optimizations** (JVM tuning, DB pooling, Nginx caching)
 
 ---
 
@@ -45,16 +48,69 @@ make setup
 ```
 
 These commands will:
-1. ✅ Build the Docker image with multi-stage compilation
-2. ✅ Start MySQL database container
-3. ✅ Start Spring Boot application container
+1. ✅ Build Docker images (MySQL, Spring Boot API, React Frontend)
+2. ✅ Start all services (3 containers)
+3. ✅ **Automatically open the UI** in your browser at http://localhost:3000
 4. ✅ Initialize database with sample data
 
-After setup, access the application at: **http://localhost:8080**
+After setup, you can immediately:
+- View users in the React UI
+- Create, edit, and delete users
+- See real-time API integration
 
 ---
 
 ## 📋 Architecture
+
+### Full-Stack Application Architecture
+
+```
+┌──────────────────────────────────────────────────┐
+│         Browser / User Interface                 │
+└──────────────────┬───────────────────────────────┘
+                   │ HTTP Requests
+                   ↓
+┌──────────────────────────────────────────────────┐
+│    React Frontend (Port 3000)                    │
+├──────────────────────────────────────────────────┤
+│ • React 18 (Single Page Application)             │
+│ • Bootstrap 5 UI Styling                         │
+│ • Nginx Web Server (Multi-stage build)           │
+│ • User Management Interface                      │
+│ • Form Validation & Error Handling               │
+└──────────────────┬───────────────────────────────┘
+                   │ API Calls (REST)
+                   ↓
+┌──────────────────────────────────────────────────┐
+│    Spring Boot API (Port 8080)                   │
+├──────────────────────────────────────────────────┤
+│ • Spring Boot 3.4.2 REST API                     │
+│ • User Controller with CRUD endpoints            │
+│ • Spring Data JPA for database access            │
+│ • Java 21 (Multi-stage build)                    │
+│ • Health checks & monitoring                     │
+└──────────────────┬───────────────────────────────┘
+                   │ JDBC Queries
+                   ↓
+┌──────────────────────────────────────────────────┐
+│    MySQL Database (Port 3306)                    │
+├──────────────────────────────────────────────────┤
+│ • MySQL 8 Database Server                        │
+│ • User table with schema management              │
+│ • Connection pooling (Hikari)                    │
+│ • Health checks for orchestration                │
+└──────────────────────────────────────────────────┘
+
+All services connected via Docker bridge network (app-network)
+```
+
+### Three Docker Containers
+
+| Container | Port | Technology | Purpose |
+|-----------|------|-----------|---------|
+| **frontend** | 3000 | React + Nginx | User interface |
+| **user-service** | 8080 | Spring Boot + Java 21 | REST API |
+| **mysql-db** | 3306 | MySQL 8 | Database |
 
 ### Multi-Stage Docker Build Strategy
 
@@ -116,36 +172,59 @@ Production (docker-compose.prod.yml)
 
 ```
 mvc-docker-demo/
-├── Dockerfile                      # Multi-stage build configuration
-├── docker-compose.yml              # Development environment
+├── Dockerfile                      # Multi-stage build (Spring Boot App)
+├── docker-compose.yml              # Development environment (3 services)
 ├── docker-compose.prod.yml         # Production environment
-├── .dockerignore                   # Docker build exclusions
+├── .dockerignore                   # Build context optimization
 ├── .env.example                    # Environment variables template
-├── Makefile                        # Easy command shortcuts
+├── Makefile                        # Development commands
 ├── setup.sh                        # Linux/Mac automated setup
-├── setup.ps1                       # Windows automated setup
-├── README.md                       # This file
+├── setup.ps1                       # Windows PowerShell setup
+├── setup.bat                       # Windows CMD setup
 │
-├── src/main/
+├── frontend/                       # React Frontend Application
+│   ├── Dockerfile                  # Multi-stage build (React + Nginx)
+│   ├── nginx.conf                  # Nginx configuration
+│   ├── package.json                # React dependencies
+│   ├── public/
+│   │   └── index.html              # HTML entry point
+│   ├── src/
+│   │   ├── App.js                  # Main React component
+│   │   ├── index.js                # React entry point
+│   │   ├── App.css                 # App styling
+│   │   ├── index.css               # Global styling
+│   │   ├── components/
+│   │   │   ├── UserList.js         # Users table display
+│   │   │   └── UserForm.js         # User create/edit form
+│   │   └── services/
+│   │       └── userService.js      # API communication
+│   ├── .dockerignore               # Docker build exclusions
+│   ├── .env                        # Frontend environment config
+│   └── README.md                   # Frontend documentation
+│
+├── src/main/                       # Spring Boot Application
 │   ├── java/com/mvc_docker/
 │   │   ├── MvcDockerApplication.java
 │   │   ├── controller/
-│   │   │   └── UserController.java
+│   │   │   └── UserController.java  # REST endpoints
 │   │   ├── entity/
-│   │   │   ├── User.java
-│   │   │   └── UserDto.java
+│   │   │   ├── User.java            # Database entity
+│   │   │   └── UserDto.java         # Data transfer object
 │   │   ├── repository/
-│   │   │   └── UserRepository.java
+│   │   │   └── UserRepository.java  # Database access
 │   │   └── service/
 │   │       ├── UserService.java
 │   │       └── UserServiceImpl.java
 │   │
 │   └── resources/
-│       ├── application.properties          # Default config
-│       ├── application-dev.properties      # Development profile
-│       ├── application-prod.properties     # Production profile
-│       └── data.sql                        # Sample data
+│       ├── application.properties           # Default config
+│       ├── application-dev.properties       # Dev profile
+│       ├── application-prod.properties      # Prod profile
+│       └── data.sql                         # Sample database data
 │
+└── gradle/
+    └── wrapper/                    # Gradle build wrapper
+```
 └── gradle/
     └── wrapper/
 ```
@@ -380,16 +459,40 @@ hibernate.jdbc.batch_size=20
 
 ## 📝 API Endpoints
 
-Once running (http://localhost:8080):
+### Frontend (React UI)
+**Primary way to interact with the application:**
+- **URL:** http://localhost:3000
+- Access all user management features through the React interface
 
-**Health Check:**
+### Direct API Access
+**For testing/development (directly call the Spring Boot API):**
 ```bash
+# Health Check
 curl http://localhost:8080/actuator/health
+
+# Get all users
+curl http://localhost:8080/users
+
+# Create user
+curl -X POST http://localhost:8080/users \
+  -H "Content-Type: application/json" \
+  -d '{"name":"John","email":"john@example.com","phone":"123456","address":"123 Main St"}'
+
+# Get user by ID
+curl http://localhost:8080/users/1
+
+# Update user
+curl -X PUT http://localhost:8080/users/1 \
+  -H "Content-Type: application/json" \
+  -d '{"name":"John Updated","email":"john.updated@example.com","phone":"987654","address":"456 Main St"}'
+
+# Delete user
+curl -X DELETE http://localhost:8080/users/1
 ```
 
-**Application Endpoints** (depends on your UserController):
+### Endpoints Implemented
 - `GET /users` - List all users
-- `POST /users` - Create user
+- `POST /users` - Create new user
 - `GET /users/{id}` - Get user by ID
 - `PUT /users/{id}` - Update user
 - `DELETE /users/{id}` - Delete user

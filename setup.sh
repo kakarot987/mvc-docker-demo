@@ -55,8 +55,9 @@ echo "✓ Cleaned up"
 echo ""
 
 # Build the Docker image
-echo "🔨 Building Docker image with multi-stage build..."
+echo "🔨 Building Docker images..."
 echo "   (This may take a few minutes on first run)"
+echo "   Building: MySQL, Spring Boot API, React Frontend"
 echo ""
 docker-compose -f docker-compose.yml build
 echo ""
@@ -76,19 +77,35 @@ echo "🔍 Checking service health..."
 docker-compose -f docker-compose.yml ps
 
 echo ""
+echo "⏳ Waiting for frontend to be fully ready..."
+sleep 3
+
+echo ""
 echo "========================================"
 echo "✅ Setup Complete!"
 echo "========================================"
 echo ""
-echo "🌐 Application URL: http://localhost:8080"
-echo "🗄️  Database: localhost:3306 (user:userpassword)"
+echo "🌐 Frontend:  http://localhost:3000  (opening in browser...)"
+echo "🔌 API:       http://localhost:8080"
+echo "🗄️  Database:  localhost:3306 (user:userpassword)"
 echo ""
 echo "📝 Useful Commands:"
-echo "   make dev-logs    - View application logs"
-echo "   make db-logs     - View database logs"
-echo "   make healthcheck - Check container status"
-echo "   make clean       - Stop containers"
+echo "   docker-compose logs -f        - View all logs"
+echo "   docker-compose logs -f frontend - View frontend logs"
+echo "   docker-compose down           - Stop containers"
 echo ""
 echo "📖 For more info, see README.md"
 echo "========================================"
+echo ""
+
+# Open browser if possible
+if command -v xdg-open &> /dev/null; then
+    # Linux
+    xdg-open "http://localhost:3000" &
+elif command -v open &> /dev/null; then
+    # macOS
+    open "http://localhost:3000"
+else
+    echo "Please visit http://localhost:3000 in your browser"
+fi
 

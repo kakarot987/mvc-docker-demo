@@ -62,7 +62,7 @@ Write-Host "Cleaned up" -ForegroundColor Green
 Write-Host ""
 
 # Build the Docker image
-Write-Host "Building Docker image with multi-stage build..." -ForegroundColor Cyan
+Write-Host "Building Docker images..." -ForegroundColor Cyan
 Write-Host "(This may take a few minutes on first run)" -ForegroundColor Gray
 Write-Host ""
 
@@ -78,6 +78,7 @@ Write-Host ""
 
 # Start the development environment
 Write-Host "Starting development environment..." -ForegroundColor Cyan
+Write-Host "(MySQL, Spring Boot API, React Frontend)" -ForegroundColor Gray
 docker-compose -f docker-compose.yml up -d
 
 if ($LASTEXITCODE -ne 0) {
@@ -88,25 +89,41 @@ if ($LASTEXITCODE -ne 0) {
 Write-Host ""
 
 # Wait for services to be healthy
-Write-Host " Waiting for services to be ready..." -ForegroundColor Yellow
+Write-Host "Waiting for services to be ready..." -ForegroundColor Yellow
 Start-Sleep -Seconds 5
 
-Write-Host " Checking service health..." -ForegroundColor Yellow
+Write-Host "Checking service health..." -ForegroundColor Yellow
 docker-compose -f docker-compose.yml ps
+
+# Wait a bit more for frontend to be ready
+Write-Host ""
+Write-Host "Waiting for frontend to be fully ready..." -ForegroundColor Yellow
+Start-Sleep -Seconds 3
 
 Write-Host ""
 Write-Host "========================================" -ForegroundColor Green
-Write-Host " Setup Complete!" -ForegroundColor Green
+Write-Host "Setup Complete!" -ForegroundColor Green
 Write-Host "========================================" -ForegroundColor Green
 Write-Host ""
-Write-Host " Application URL: http://localhost:8080" -ForegroundColor Cyan
-Write-Host "  Database: localhost:3306 (user:userpassword)" -ForegroundColor Cyan
+Write-Host "Frontend URL:    http://localhost:3000   (Opening in browser...)" -ForegroundColor Cyan
+Write-Host "API URL:         http://localhost:8080" -ForegroundColor Cyan
+Write-Host "Database:        localhost:3306 (user:userpassword)" -ForegroundColor Cyan
 Write-Host ""
-Write-Host " Next Steps:" -ForegroundColor Yellow
-Write-Host "   Check logs:      docker-compose logs -f user-service" -ForegroundColor Gray
+Write-Host "Next Steps:" -ForegroundColor Yellow
+Write-Host "   Check logs:      docker-compose logs -f" -ForegroundColor Gray
 Write-Host "   Stop services:   docker-compose down" -ForegroundColor Gray
 Write-Host "   View help:       make help" -ForegroundColor Gray
 Write-Host ""
-Write-Host " For more info, see README.md" -ForegroundColor Cyan
+Write-Host "For more info, see README.md" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Green
+Write-Host ""
+
+# Open browser
+try {
+    Start-Process "http://localhost:3000"
+    Write-Host "Browser opened automatically" -ForegroundColor Green
+}
+catch {
+    Write-Host "Could not open browser automatically. Visit http://localhost:3000 manually" -ForegroundColor Yellow
+}
 

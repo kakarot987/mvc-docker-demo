@@ -59,6 +59,29 @@ services:
         max-size: "10m"
         max-file: "3"
 
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: mvc-ui-prod
+    restart: always
+    depends_on:
+      user-service:
+        condition: service_started
+    ports:
+      - "3000:3000"
+    networks:
+      - app-network
+    environment:
+      - REACT_APP_API_URL=http://user-service:8080/users
+    labels:
+      - "com.mvc-docker.environment=production"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
 volumes:
   mysql_prod_data:
     driver: local
@@ -66,4 +89,3 @@ volumes:
 networks:
   app-network:
     driver: bridge
-

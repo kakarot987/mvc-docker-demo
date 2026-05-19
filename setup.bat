@@ -64,8 +64,9 @@ echo [OK] Cleaned up
 echo.
 
 REM Build the Docker image
-echo Building Docker image with multi-stage build...
+echo Building Docker images...
 echo (This may take a few minutes on first run)
+echo Building: MySQL, Spring Boot API, React Frontend
 echo.
 
 docker-compose -f docker-compose.yml build
@@ -100,20 +101,30 @@ echo Checking service health...
 docker-compose -f docker-compose.yml ps
 
 echo.
+echo Waiting for frontend to be fully ready...
+timeout /t 3 /nobreak
+
+echo.
 echo ========================================
 echo [SUCCESS] Setup Complete!
 echo ========================================
 echo.
-echo Application URL: http://localhost:8080
-echo Database: localhost:3306 (user:userpassword)
+echo Frontend URL:   http://localhost:3000 (opening in browser...)
+echo API URL:        http://localhost:8080
+echo Database:       localhost:3306 (user:userpassword)
 echo.
 echo Next Steps:
-echo   Check logs:      docker-compose logs -f user-service
-echo   Stop services:   docker-compose down
-echo   View help:       docker-compose help
+echo   View all logs:     docker-compose logs -f
+echo   View app logs:     docker-compose logs -f user-service
+echo   View frontend logs: docker-compose logs -f frontend
+echo   Stop services:     docker-compose down
 echo.
 echo For more info, see README.md
 echo ========================================
 echo.
+
+REM Try to open the browser
+start http://localhost:3000
+
 pause
 
