@@ -23,7 +23,7 @@ catch {
 
 # Check for Docker Compose
 try {
-    $composeVersion = docker-compose --version
+    $composeVersion = docker compose version
     Write-Host "Docker Compose found: $composeVersion" -ForegroundColor Green
 }
 catch {
@@ -57,7 +57,7 @@ if (-not (Test-Path "backups")) {
 
 # Stop any running containers
 Write-Host "Stopping any running containers..." -ForegroundColor Yellow
-docker-compose -f docker-compose.yml down --remove-orphans 2>$null
+docker compose -f docker compose.yml down --remove-orphans 2>$null
 Write-Host "Cleaned up" -ForegroundColor Green
 Write-Host ""
 
@@ -66,7 +66,7 @@ Write-Host "Building Docker images..." -ForegroundColor Cyan
 Write-Host "(This may take a few minutes on first run)" -ForegroundColor Gray
 Write-Host ""
 
-docker-compose -f docker-compose.yml build
+docker compose -f docker compose.yml build
 if ($LASTEXITCODE -ne 0) {
     Write-Host "Build failed" -ForegroundColor Red
     exit 1
@@ -79,7 +79,7 @@ Write-Host ""
 # Start the development environment
 Write-Host "Starting development environment..." -ForegroundColor Cyan
 Write-Host "(MySQL, Spring Boot API, React Frontend)" -ForegroundColor Gray
-docker-compose -f docker-compose.yml up -d
+docker compose -f docker compose.yml up -d
 
 if ($LASTEXITCODE -ne 0) {
     Write-Host "Failed to start containers" -ForegroundColor Red
@@ -93,7 +93,7 @@ Write-Host "Waiting for services to be ready..." -ForegroundColor Yellow
 Start-Sleep -Seconds 5
 
 Write-Host "Checking service health..." -ForegroundColor Yellow
-docker-compose -f docker-compose.yml ps
+docker compose -f docker compose.yml ps
 
 # Wait a bit more for frontend to be ready
 Write-Host ""
@@ -110,8 +110,8 @@ Write-Host "API URL:         http://localhost:8080" -ForegroundColor Cyan
 Write-Host "Database:        localhost:3306 (user:userpassword)" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "Next Steps:" -ForegroundColor Yellow
-Write-Host "   Check logs:      docker-compose logs -f" -ForegroundColor Gray
-Write-Host "   Stop services:   docker-compose down" -ForegroundColor Gray
+Write-Host "   Check logs:      docker compose logs -f" -ForegroundColor Gray
+Write-Host "   Stop services:   docker compose down" -ForegroundColor Gray
 Write-Host "   View help:       make help" -ForegroundColor Gray
 Write-Host ""
 Write-Host "For more info, see README.md" -ForegroundColor Cyan
