@@ -20,6 +20,8 @@ public class UserServiceImpl implements UserService {
         User user = User.builder()
                 .name(userDto.getName())
                 .email(userDto.getEmail())
+                .phone(userDto.getPhone())
+                .address(userDto.getAddress())
                 .build();
         User savedUser = userRepository.save(user);
         return convertToDto(savedUser);
@@ -27,7 +29,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto getUserById(Long id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findById(id).orElseThrow(() -> new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.NOT_FOUND, "User not found"));
         return convertToDto(user);
     }
 
@@ -38,16 +40,18 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto updateUser(Long id, UserDto userDto) {
-        User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findById(id).orElseThrow(() -> new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.NOT_FOUND, "User not found"));
         user.setName(userDto.getName());
         user.setEmail(userDto.getEmail());
+        user.setPhone(userDto.getPhone());
+        user.setAddress(userDto.getAddress());
         User updatedUser = userRepository.save(user);
         return convertToDto(updatedUser);
     }
 
     @Override
     public void deleteUser(Long id) {
-        userRepository.deleteById(id);
+        userRepository.delete(userRepository.findById(id).orElseThrow(() -> new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.NOT_FOUND, "User not found")));
     }
 
     private UserDto convertToDto(User user) {
@@ -55,6 +59,8 @@ public class UserServiceImpl implements UserService {
                 .id(user.getId())
                 .name(user.getName())
                 .email(user.getEmail())
+                .phone(user.getPhone())
+                .address(user.getAddress())
                 .build();
     }
 }

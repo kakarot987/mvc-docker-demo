@@ -24,14 +24,14 @@ for /f "tokens=*" %%i in ('docker --version') do set DOCKER_VERSION=%%i
 echo [OK] Docker found: %DOCKER_VERSION%
 
 REM Check for Docker Compose
-docker-compose --version >nul 2>&1
+docker compose version >nul 2>&1
 if errorlevel 1 (
     echo ERROR: Docker Compose is not installed or not in PATH
     pause
     exit /b 1
 )
 
-for /f "tokens=*" %%i in ('docker-compose --version') do set COMPOSE_VERSION=%%i
+for /f "tokens=*" %%i in ('docker compose version') do set COMPOSE_VERSION=%%i
 echo [OK] Docker Compose found: %COMPOSE_VERSION%
 
 echo.
@@ -59,7 +59,7 @@ if not exist "backups" (
 
 REM Stop any running containers
 echo Stopping any running containers...
-docker-compose -f docker-compose.yml down --remove-orphans 2>nul
+docker compose -f docker compose.yml down --remove-orphans 2>nul
 echo [OK] Cleaned up
 echo.
 
@@ -69,7 +69,7 @@ echo (This may take a few minutes on first run)
 echo Building: MySQL, Spring Boot API, React Frontend
 echo.
 
-docker-compose -f docker-compose.yml build
+docker compose -f docker compose.yml build
 
 if errorlevel 1 (
     echo [ERROR] Build failed
@@ -83,7 +83,7 @@ echo.
 
 REM Start the development environment
 echo Starting development environment...
-docker-compose -f docker-compose.yml up -d
+docker compose -f docker compose.yml up -d
 
 if errorlevel 1 (
     echo [ERROR] Failed to start containers
@@ -98,7 +98,7 @@ echo Waiting for services to be ready...
 timeout /t 5 /nobreak
 
 echo Checking service health...
-docker-compose -f docker-compose.yml ps
+docker compose -f docker compose.yml ps
 
 echo.
 echo Waiting for frontend to be fully ready...
@@ -114,10 +114,10 @@ echo API URL:        http://localhost:8080
 echo Database:       localhost:3306 (user:userpassword)
 echo.
 echo Next Steps:
-echo   View all logs:     docker-compose logs -f
-echo   View app logs:     docker-compose logs -f user-service
-echo   View frontend logs: docker-compose logs -f frontend
-echo   Stop services:     docker-compose down
+echo   View all logs:     docker compose logs -f
+echo   View app logs:     docker compose logs -f user-service
+echo   View frontend logs: docker compose logs -f frontend
+echo   Stop services:     docker compose down
 echo.
 echo For more info, see README.md
 echo ========================================

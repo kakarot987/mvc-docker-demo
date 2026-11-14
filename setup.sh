@@ -19,7 +19,7 @@ if ! command -v docker &> /dev/null; then
 fi
 
 # Check for Docker Compose
-if ! command -v docker-compose &> /dev/null; then
+if ! command -v docker compose &> /dev/null; then
     echo "❌ Docker Compose is not installed. Please install Docker Compose first."
     exit 1
 fi
@@ -50,7 +50,7 @@ fi
 
 # Stop any running containers
 echo "🛑 Stopping any running containers..."
-docker-compose -f docker-compose.yml down --remove-orphans 2>/dev/null || true
+docker compose -f docker compose.yml down --remove-orphans 2>/dev/null || true
 echo "✓ Cleaned up"
 echo ""
 
@@ -59,14 +59,14 @@ echo "🔨 Building Docker images..."
 echo "   (This may take a few minutes on first run)"
 echo "   Building: MySQL, Spring Boot API, React Frontend"
 echo ""
-docker-compose -f docker-compose.yml build
+docker compose -f docker compose.yml build
 echo ""
 echo "✓ Build complete"
 echo ""
 
 # Start the development environment
 echo "🚀 Starting development environment..."
-docker-compose -f docker-compose.yml up -d
+docker compose -f docker compose.yml up -d
 echo ""
 
 # Wait for services to be healthy
@@ -74,7 +74,7 @@ echo "⏳ Waiting for services to be ready..."
 sleep 5
 
 echo "🔍 Checking service health..."
-docker-compose -f docker-compose.yml ps
+docker compose -f docker compose.yml ps
 
 echo ""
 echo "⏳ Waiting for frontend to be fully ready..."
@@ -90,9 +90,9 @@ echo "🔌 API:       http://localhost:8080"
 echo "🗄️  Database:  localhost:3306 (user:userpassword)"
 echo ""
 echo "📝 Useful Commands:"
-echo "   docker-compose logs -f        - View all logs"
-echo "   docker-compose logs -f frontend - View frontend logs"
-echo "   docker-compose down           - Stop containers"
+echo "   docker compose logs -f        - View all logs"
+echo "   docker compose logs -f frontend - View frontend logs"
+echo "   docker compose down           - Stop containers"
 echo ""
 echo "📖 For more info, see README.md"
 echo "========================================"

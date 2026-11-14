@@ -1,42 +1,23 @@
-# ==================== PRODUCTION ENVIRONMENT ====================
-# Run: docker-compose -f docker-compose.prod.yml --env-file .env up -d
-# This compose file is for production deployment with security and performance optimizations
-# Requires .env file with secure credentials
-
 services:
   mysql-db:
     image: mysql:8
-    container_name: mvc-mysql-prod
-    restart: always
+    restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${DB_NAME}
-      MYSQL_USER: ${DB_USER}
-      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?Set DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME:?Set DB_NAME}
+      MYSQL_USER: ${DB_USER:?Set DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD}
     volumes:
       - mysql_prod_data:/var/lib/mysql
-      - ./backups:/backups
-    networks:
-      - app-network
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD}"]
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root -p\"$$MYSQL_ROOT_PASSWORD\" --silent"]
       interval: 10s
       timeout: 5s
-      retries: 5
-    labels:
-      - "com.mvc-docker.environment=production"
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-
+      retries: 10
+    networks: [app-network]
   user-service:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: mvc-app-prod
-    restart: always
+    build: .
+    restart: unless-stopped
     depends_on:
       mysql-db:
         condition: service_healthy
@@ -45,47 +26,24 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/${DB_NAME}?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
       SPRING_DATASOURCE_USERNAME: ${DB_USER}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
-      SPRING_JPA_HIBERNATE_DDL_AUTO: validate
-      JAVA_OPTS: "-Xmx512m -Xms256m -XX:+UseG1GC -XX:MaxGCPauseMillis=200"
-    ports:
-      - "8080:8080"
-    networks:
-      - app-network
-    labels:
-      - "com.mvc-docker.environment=production"
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-
+      JAVA_TOOL_OPTIONS: "-Xms256m -Xmx512m -XX:+UseG1GC"
+    healthcheck:
+      test: ["CMD", "java", "-cp", "/app", "HealthProbe"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    networks: [app-network]
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    container_name: mvc-ui-prod
-    restart: always
+    build: ./frontend
+    restart: unless-stopped
     depends_on:
       user-service:
-        condition: service_started
-    ports:
-      - "3000:3000"
-    networks:
-      - app-network
-    environment:
-      - REACT_APP_API_URL=http://user-service:8080/users
-    labels:
-      - "com.mvc-docker.environment=production"
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-
+        condition: service_healthy
+    ports: ["3000:3000"]
+    networks: [app-network]
 volumes:
   mysql_prod_data:
-    driver: local
-
 networks:
   app-network:
     driver: bridge
