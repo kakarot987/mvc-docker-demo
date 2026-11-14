@@ -41,23 +41,23 @@ help:
 # ==================== DEVELOPMENT ====================
 dev:
 	@echo "Starting development environment..."
-	docker-compose -f docker-compose.yml up -d
+	docker compose -f docker compose.yml up -d
 	@echo "✓ Development environment started"
-	@echo "App running at: http://localhost:8080"
-	@echo "Database running at: localhost:3306"
+	@echo "App frontend at: http://localhost:3000"
+	@echo "MySQL and backend are internal only in production"
 
 dev-build:
 	@echo "Building and starting development environment..."
-	docker-compose -f docker-compose.yml build
-	docker-compose -f docker-compose.yml up -d
+	docker compose -f docker compose.yml build
+	docker compose -f docker compose.yml up -d
 	@echo "✓ Development environment ready"
 
 dev-logs:
-	docker-compose -f docker-compose.yml logs -f user-service
+	docker compose -f docker compose.yml logs -f user-service
 
 dev-down:
 	@echo "Stopping development environment..."
-	docker-compose -f docker-compose.yml down
+	docker compose -f docker compose.yml down
 	@echo "✓ Development environment stopped"
 
 # ==================== PRODUCTION ====================
@@ -68,10 +68,10 @@ prod:
 		echo "Please copy .env.example to .env and fill in production values"; \
 		exit 1; \
 	fi
-	docker-compose -f docker-compose.prod.yml --env-file .env up -d
+	docker compose -f docker compose.prod.yml --env-file .env up -d
 	@echo "✓ Production environment started"
-	@echo "App running at: http://localhost:8080"
-	@echo "Database running at: localhost:3306"
+	@echo "App frontend at: http://localhost:3000"
+	@echo "MySQL and backend are internal only in production"
 
 prod-build:
 	@echo "Building and starting production environment..."
@@ -80,57 +80,57 @@ prod-build:
 		echo "Please copy .env.example to .env and fill in production values"; \
 		exit 1; \
 	fi
-	docker-compose -f docker-compose.prod.yml --env-file .env build
-	docker-compose -f docker-compose.prod.yml --env-file .env up -d
+	docker compose -f docker compose.prod.yml --env-file .env build
+	docker compose -f docker compose.prod.yml --env-file .env up -d
 	@echo "✓ Production environment ready"
 
 prod-logs:
 	@if [ ! -f .env ]; then \
-		docker-compose -f docker-compose.prod.yml logs -f user-service; \
+		docker compose -f docker compose.prod.yml logs -f user-service; \
 	else \
-		docker-compose -f docker-compose.prod.yml --env-file .env logs -f user-service; \
+		docker compose -f docker compose.prod.yml --env-file .env logs -f user-service; \
 	fi
 
 prod-down:
 	@echo "Stopping production environment..."
-	docker-compose -f docker-compose.prod.yml down
+	docker compose -f docker compose.prod.yml down
 	@echo "✓ Production environment stopped"
 
 # ==================== BUILD ====================
 build:
 	@echo "Building Docker image (multi-stage)..."
-	docker-compose -f docker-compose.yml build
+	docker compose -f docker compose.yml build
 	@echo "✓ Build complete"
 
 build-nc:
 	@echo "Building Docker image without cache..."
-	docker-compose -f docker-compose.yml build --no-cache
+	docker compose -f docker compose.yml build --no-cache
 	@echo "✓ Build complete"
 
 # ==================== LOGS & MONITORING ====================
 logs:
-	docker-compose -f docker-compose.yml logs -f
+	docker compose -f docker compose.yml logs -f
 
 db-logs:
-	docker-compose -f docker-compose.yml logs -f mysql-db
+	docker compose -f docker compose.yml logs -f mysql-db
 
 healthcheck:
 	@echo "Checking container health..."
-	@docker-compose -f docker-compose.yml ps
+	@docker compose -f docker compose.yml ps
 	@echo ""
 	@curl -s http://localhost:8080/actuator/health | python3 -m json.tool 2>/dev/null || echo "App health check endpoint not responding"
 
 # ==================== SHELL ACCESS ====================
 shell-app:
-	docker-compose -f docker-compose.yml exec user-service sh
+	docker compose -f docker compose.yml exec user-service sh
 
 shell-db:
-	docker-compose -f docker-compose.yml exec mysql-db mysql -h localhost -u user -puserpassword userdb
+	docker compose -f docker compose.yml exec mysql-db mysql -h localhost -u user -puserpassword userdb
 
 # ==================== CLEANUP ====================
 clean:
 	@echo "Stopping and removing containers..."
-	docker-compose -f docker-compose.yml down
+	docker compose -f docker compose.yml down
 	@echo "✓ Containers removed (volumes preserved)"
 
 clean-all:
@@ -138,7 +138,7 @@ clean-all:
 	@read -p "Continue? [y/N] " -n 1 -r; \
 	echo; \
 	if [[ $$REPLY =~ ^[Yy]$$ ]]; then \
-		docker-compose -f docker-compose.yml down -v; \
+		docker compose -f docker compose.yml down -v; \
 		echo "✓ All containers and volumes removed"; \
 	else \
 		echo "✗ Cancelled"; \
@@ -146,7 +146,7 @@ clean-all:
 
 clean-images:
 	@echo "Removing Docker images..."
-	docker-compose -f docker-compose.yml down --rmi all
+	docker compose -f docker compose.yml down --rmi all
 	@echo "✓ Images removed"
 
 # ==================== ONE-COMMAND SETUP ====================
@@ -163,15 +163,15 @@ setup:
 		echo ""
 	fi
 	@echo "Building application..."
-	docker-compose -f docker-compose.yml build
+	docker compose -f docker compose.yml build
 	@echo "✓ Build complete"
 	@echo ""
 	@echo "Starting development environment..."
-	docker-compose -f docker-compose.yml up -d
+	docker compose -f docker compose.yml up -d
 	@echo "✓ Environment ready!"
 	@echo ""
 	@echo "========================================"
-	@echo "Application is running at: http://localhost:8080"
+	@echo "Application frontend is running at: http://localhost:3000"
 	@echo "Database is running at: localhost:3306"
 	@echo "========================================"
 
